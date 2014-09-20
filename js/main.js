@@ -57,14 +57,27 @@ $(document).ready(function () {
 
   game.addToSnake = function (apple) {
     game.snake.unshift(apple);
-    game.apple = game.newApple();
+  };
+
+  game.checkIfEatsApple = function () {
+    if (game.apple.toString() === game.snakeHead.toString()) {
+      $(game.board[game.apple[0]][game.apple[1]]).removeClass('apple-spot');
+      game.addToSnake(game.apple);
+      game.apple = game.newApple();
+    }
   };
 
   game.newApple = function () {
-    return [_.random(0, 19), _.random(0, 19)]
+    return [_.random(0, 19), _.random(0, 19)];
   };
 
-  game.renderBoard = function () {
+  game.checkIfOutOfBounds = function () {
+    if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
+      game.initialize();
+    }
+  };
+
+  game.render = function () {
     $('.square').removeClass('snake-spot');
 
     _.each(game.snake, function (spot) {
@@ -72,29 +85,16 @@ $(document).ready(function () {
     });
 
     $(game.board[game.apple[0]][game.apple[1]]).addClass('apple-spot');
+
+    $('#score').html(game.snake.length);
   };
 
   game.tick = function () {
     game.snakeHead = _.last(game.snake);
-
     game.moveSnake();
-
-    // check if snake eats apple
-    if (game.apple.toString() === game.snakeHead.toString()) {
-      console.log($(game.board[game.apple[0]][game.apple[1]]));
-      $(game.board[game.apple[0]][game.apple[1]]).removeClass('apple-spot');
-      game.addToSnake(game.apple);
-    }
-
-    // reset if out-of-bounds
-    if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
-      game.initialize();
-    }
-
-    game.renderBoard();
-
-    // update score
-    $('#score').html(game.snake.length);
+    game.checkIfEatsApple();
+    game.checkIfOutOfBounds();
+    game.render();
   };
 
   game.initialize = function () {

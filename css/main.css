@@ -40,5 +40,6 @@ p {
 }
 
 .apple-spot {
-  background: red;
+  background: url('https://s3.amazonaws.com/alaughlin/images/apple.png') center no-repeat;
+  background-size: contain;
 }
