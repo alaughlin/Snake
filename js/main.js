@@ -68,14 +68,22 @@ $(document).ready(function () {
   };
 
   game.newApple = function () {
-    return [_.random(0, 19), _.random(0, 19)];
+    var snake = _.map(game.snake, function (spot) { return String(spot) });
+    var newApple = [_.random(0, 19), _.random(0, 19)];
+    while (_.contains(snake, String(newApple))) {
+      newApple = [_.random(0, 19), _.random(0, 19)];
+    }
+
+    return newApple;
   };
 
   game.checkIfCollision = function () {
+    // out of bounds?
     if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
       game.initialize();
     }
 
+    // did we collide with ourself?
     var body = _.map(game.snakeBody, function (spot) { return String(spot) });
     if (_.contains(body, String(game.snakeHead))) {
       console.log("fired");
@@ -92,7 +100,7 @@ $(document).ready(function () {
 
     $(game.board[game.apple[0]][game.apple[1]]).addClass('apple-spot');
 
-    $('#score').html(game.snake.length);
+    $('#score').html(game.snake.length - 1);
   };
 
   game.tick = function () {
@@ -131,6 +139,7 @@ $(document).ready(function () {
   };
 
   game.initialize();
+
   window.setInterval(function () {
     game.tick();
   }, 75);
