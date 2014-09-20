@@ -1,10 +1,12 @@
 $(document).ready(function () {
   var game = window.game = {};
-  game.board = [];
-  game.snake = [[10, 10], [10, 11], [10, 12]];
-  game.direction = 39;
 
   game.renderBoard = function () {
+    game.snakeHead = _.last(game.snake);
+    if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
+      game.initialize();
+    }
+
     var xDelta;
     var yDelta;
     
@@ -25,10 +27,17 @@ $(document).ready(function () {
       xDelta = 0;
       yDelta = 1;
       break;
+    default:
+      xDelta = 0;
+      yDelta = 0;
+      break;
     }
 
-    game.snake.shift();
-    game.snake.push([_.last(game.snake)[0] + yDelta, _.last(game.snake)[1] + xDelta])
+    if (game.direction) {
+      game.snake.shift();
+      game.snake.push([_.last(game.snake)[0] + yDelta, _.last(game.snake)[1] + xDelta]);
+    }
+
     $('.square').removeClass('snake-spot');
 
     _.each(game.snake, function (spot) {
@@ -37,6 +46,11 @@ $(document).ready(function () {
   };
 
   game.initialize = function () {
+    game.board = [];
+    game.snake = [[10, 10], [10, 11], [10, 12]];
+    game.direction = null;
+    $('#game-board').html("");
+
     for (var i = 0; i < 20; i++) {
       game.board.push([]);
       for (var j = 0; j < 20; j++) {
@@ -49,11 +63,10 @@ $(document).ready(function () {
       game.direction = event.keyCode;
       return false;
     });
-
-    window.setInterval(function () {
-      game.renderBoard();
-    }, 100);
   };
 
   game.initialize();
+  window.setInterval(function () {
+      game.renderBoard();
+    }, 75);
 });
