@@ -57,35 +57,41 @@ $(document).ready(function () {
 
   game.addToSnake = function (apple) {
     game.snake.unshift(apple);
+    game.apple = game.newApple();
+  };
+
+  game.newApple = function () {
+    return [_.random(0, 19), _.random(0, 19)]
   };
 
   game.renderBoard = function () {
+    $('.square').removeClass('snake-spot');
+
+    _.each(game.snake, function (spot) {
+      $(game.board[spot[0]][spot[1]]).addClass('snake-spot');
+    });
+
+    $(game.board[game.apple[0]][game.apple[1]]).addClass('apple-spot');
+  };
+
+  game.tick = function () {
     game.snakeHead = _.last(game.snake);
 
+    game.moveSnake();
+
     // check if snake eats apple
-    _.each(game.apples, function (apple) {
-      if (apple.toString() === game.snakeHead.toString()) {
-        game.apples = _.reject(game.apples, function (spot) { return apple === spot});
-        $('.square[data-coord="[' + apple[0] + ', ' + apple[1] + ']"]').removeClass('apple-spot');
-        game.addToSnake(apple);
-      }
-    });
+    if (game.apple.toString() === game.snakeHead.toString()) {
+      console.log($(game.board[game.apple[0]][game.apple[1]]));
+      $(game.board[game.apple[0]][game.apple[1]]).removeClass('apple-spot');
+      game.addToSnake(game.apple);
+    }
 
     // reset if out-of-bounds
     if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
       game.initialize();
     }
 
-    // wipe squares and redraw
-    $('.square').removeClass('snake-spot');
-
-    _.each(game.snake, function (spot) {
-      $('.square[data-coord="[' + spot[0] + ', ' + spot[1] + ']"]').addClass('snake-spot');
-    });
-
-    _.each(game.apples, function (spot) {
-      $('.square[data-coord="[' + spot[0] + ', ' + spot[1] + ']"]').addClass('apple-spot');
-    });
+    game.renderBoard();
 
     // update score
     $('#score').html(game.snake.length);
@@ -94,7 +100,7 @@ $(document).ready(function () {
   game.initialize = function () {
     game.board = [];
     game.snake = [[10, 10]];
-    game.apples = [];
+    game.apple = game.newApple();
     game.moving = false;
     game.direction = null;
     // we need to wipe the board when a reset happens
@@ -104,12 +110,10 @@ $(document).ready(function () {
     for (var i = 0; i < 20; i++) {
       game.board.push([]);
       for (var j = 0; j < 20; j++) {
-        game.board[i][j] = null;
-        $('#game-board').append('<div class="square" data-coord="[' + i + ', ' + j + ']"></div>');
+        game.board[i][j] = $('<div class="square"></div>');
+        $('#game-board').append(game.board[i][j]);
       }
     }
-
-    game.apples = [[10, 12], [0, 0], [5, 5]];
 
     Mousetrap.bind(['left', 'up', 'right', 'down'], function (event) {
       if (game.moving === false) { game.moving = true };
@@ -120,7 +124,6 @@ $(document).ready(function () {
 
   game.initialize();
   window.setInterval(function () {
-    game.moveSnake();
-    game.renderBoard();
+    game.tick();
   }, 75);
 });
