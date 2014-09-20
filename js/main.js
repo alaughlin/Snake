@@ -71,8 +71,14 @@ $(document).ready(function () {
     return [_.random(0, 19), _.random(0, 19)];
   };
 
-  game.checkIfOutOfBounds = function () {
+  game.checkIfCollision = function () {
     if (game.snakeHead[0] < 0 || game.snakeHead[0] > 19 || game.snakeHead[1] < 0 || game.snakeHead[1] > 19 ) {
+      game.initialize();
+    }
+
+    var body = _.map(game.snakeBody, function (spot) { return String(spot) });
+    if (_.contains(body, String(game.snakeHead))) {
+      console.log("fired");
       game.initialize();
     }
   };
@@ -91,9 +97,11 @@ $(document).ready(function () {
 
   game.tick = function () {
     game.snakeHead = _.last(game.snake);
+    game.snakeBody = game.snake.slice(0, game.snake.length - 1);
+
     game.moveSnake();
     game.checkIfEatsApple();
-    game.checkIfOutOfBounds();
+    game.checkIfCollision();
     game.render();
   };
 
