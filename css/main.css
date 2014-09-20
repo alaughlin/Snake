@@ -25,9 +25,8 @@ html, body, section, div {
 
 .square {
   float: left;
-  width: 23px;
-  height: 23px;
-  border: 1px solid #ccc;
+  width: 25px;
+  height: 25px;
 }
 
 .snake-spot {
